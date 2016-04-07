@@ -3,12 +3,20 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
+	public BoardManager boardScript;
+
+	private int level = 3;
+
+	void Awake(){
+		boardScript = GetComponent<BoardManager> ();
+		InitGame ();
 	}
-	
-	// Update is called once per frame
+
+	void InitGame(){
+		boardScript.SetupScene (level);
+	}
+
+
 	void Update () {
 	
 	}
