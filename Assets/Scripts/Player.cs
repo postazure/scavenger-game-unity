@@ -18,6 +18,7 @@ public class Player : MovingObject {
 	public AudioClip gameOverSound;
 
 	private Animator animator;
+	private Vector2 touchOrigin = -Vector2.one;
 	private int food;
 
 	void Update(){
@@ -25,18 +26,53 @@ public class Player : MovingObject {
 			return;
 		}
 
+
+
 		int horizontal = 0;
 		int vertical = 0;
 
-		horizontal = (int)Input.GetAxisRaw ("Horizontal");
-		vertical = (int)Input.GetAxisRaw ("Vertical");
-
-		PreventDiagonalMove (horizontal, vertical);
+		#if UNITY_STANDALONE || UNITY_WEBPLAYER
+			keyboardControls (ref horizontal, ref vertical);
+		#else
+			touchControls (ref horizontal, ref vertical); 
+		#endif
 
 		if (horizontal != 0 || vertical != 0 ) {
 			AttemptMove<Wall> (horizontal, vertical);
 		}
 
+
+	}
+
+	void keyboardControls (ref int horizontal, ref int vertical)
+	{
+		horizontal = (int)Input.GetAxisRaw ("Horizontal");
+		vertical = (int)Input.GetAxisRaw ("Vertical");
+		PreventDiagonalMove (horizontal, vertical);
+	}
+
+	void touchControls (ref int horizontal, ref int vertical)
+	{
+		if (Input.touchCount > 0) {
+			Touch myTouch = Input.touches [0];
+			if (myTouch.phase == TouchPhase.Began) {
+				touchOrigin = myTouch.position;
+			}
+			else
+				if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0) {
+					Vector2 touchEnd = myTouch.position;
+					float x = touchEnd.x - touchOrigin.x;
+					float y = touchEnd.y - touchOrigin.y;
+					touchOrigin.x = -1;
+					bool isHorizontalSwipe = Mathf.Abs (x) > Mathf.Abs (y);
+					if (isHorizontalSwipe) {
+						horizontal = x > 0 ? 1 : -1;
+					}
+					else {
+						vertical = y > 0 ? 1 : -1;
+					}
+				}
+		}
 	}
 
 	protected override void Start () {
