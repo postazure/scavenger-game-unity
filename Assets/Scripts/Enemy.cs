@@ -14,8 +14,10 @@ public class Enemy : MovingObject {
 		int xDir = 0;
 		int yDir = 0;
 
-		bool isSameColumnAsPlayer = Mathf.Abs (target.position.x - transform.position.x) < float.Epsilon;
-		if (isSameColumnAsPlayer) {
+		float xDelta = Mathf.Abs (target.position.x - transform.position.x);
+		float yDelta = Mathf.Abs (target.position.y - transform.position.y);
+
+		if (yDelta > xDelta) {
 			yDir = target.position.y > transform.position.y ? 1 : -1;
 		} else {
 			xDir = target.position.x > transform.position.x ? 1 : -1;
